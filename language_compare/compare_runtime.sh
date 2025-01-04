@@ -1,27 +1,47 @@
 #!/bin/bash
 
-echo 'Comparing Fibonacci calculations'
-program='Python'
+problem=fibonacci
+
+# compile if necessary
+py_program="$(find "$problem/" -type f -name "*.py")"
+[ -n "$py_program" ] || { echo "couldn't find the python file, fix this"; exit 1; }
+
+pyc_program="$(find "$problem/" -type f -name "*.pyc")"
+[ -n "$pyc_program" ] || { python -m compileall "$py_program" && pyc_program="$(find "$problem/" -type f -name "*.pyc")"; }  # compile, if it's not there
+[ -n "$pyc_program" ] || { echo "couldn't compile the python file (didn't find the compiled file), fix it"; exit 1; }  # still not there?
+
+
+# Run Programs
+# ============
+
+declare -A progcmds
+progcmds['Python']="python3 $py_program "
+progcmds['CompiledPython']="python3 $pyc_program "
+
+echo "Comparing $problem calculations"
 n=1
-max_iteration_time=0.3       # in seconds
+max_iteration_time=1       # in seconds
 max_exp_iteration_time=0.05
 
 declare -A runconfs results
-for algo in 'naive' 'straight' 'adv'; do 
-    runconfs["${program}_${algo}"]="$algo"
-    results["${program}_${algo}"]=''
+for program in "${!progcmds[@]}"; do
+    for algo in 'naive' 'straight' 'adv'; do 
+        runconfs["${program}_${algo}"]="$algo"
+        results["${program}_${algo}"]=''
+    done
 done
 
 while true; do
     for config in "${!runconfs[@]}"; do
-        algo=${runconfs[$config]}
-        
+        program=${config%%_*}
+        algo=${config#*_}
+                
         # run and measure time
         start_time=$(date +%s.%N)  # using 'time' to measure runtime proved problematic under the current circumstances
-        python3 ./fibonacci/fibo_python.py "$n" --algo "$algo" &>/dev/null || { echo "error when calculating on $program, n=$n, algorithm: $algo (fix it, I won't keep on running like that)"; exit 1; }
+        ${progcmds[$program]} "$n" --algo "$algo" &>/dev/null || { echo "error when calculating on $program, n=$n, algorithm: $algo (fix it, I won't keep on running like that)"; exit 1; }
         timed=$(echo "$(date +%s.%N) - $start_time" | bc)
         
-        echo "fib-index $n, $algo algorithm: $timed ($program)"
+        echo "$problem input $n @ $config: $timed ($program)"
         results[$config]+=" {\"$n\":\"$timed\"},"
         
         # remove from benchmark if starting to take too long
@@ -39,14 +59,14 @@ done
 # ==========
 
 # Define plot parameters
-title="Fibonacci calculation time"
+title="$problem calculation time"
 y_axis="Execution Time (s)"
-x_axis="Fibonacci Index"
+x_axis="$problem Index"
 
 temp_file=$(mktemp)
-echo "Fibonacci calculation time" >> "$temp_file"   # title
+echo "$problem calculation time" >> "$temp_file"   # title
 echo "Execution Time (s)" >> "$temp_file"           # y_axis
-echo "Fibonacci Index" >> "$temp_file"              # x_axis
+echo "$problem Index" >> "$temp_file"              # x_axis
 
 for config in "${!results[@]}"; do
     trimmed="${results[$config]%,}"

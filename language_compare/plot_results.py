@@ -1,8 +1,6 @@
 import json
 import sys
 import matplotlib.pyplot as plt
-import numpy as np
-import random
 from dataclasses import dataclass
 import colorsys
 
