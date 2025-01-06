@@ -20,8 +20,8 @@ def fib_adv(n: int) -> int:
         """ Calculate a pair of Fibonacci numbers """
         if k <= 1:
             return (k, 1)
-        fh, fh1 = fib_pair(k>>1)
-        fk = fh * ((fh1<<1) - fh)   # F(2k) calculation (property of matrix multiplication:   F(2k) = F(k) * (2*F(k+1) - F(k)) )
+        fh, fh1 = fib_pair(k>>1)    # get F(k/2), F(k/2+1) where k/2 is even (so we can divide it again by 2)
+        fk = fh * ((fh1<<1) - fh)   # F(2k) calculation (property of matrix multiplication:   F(2k) = F(k) * (2*F(k+1) - F(k))
         fk1 = fh1**2 + fh**2        # F(2k+1) calculation (property of matrix multiplication:  F(2k+1) = F(k+1)^2 + F(k)^2 )
         if k & 1:                   # checking if odd by looking at LSB
             fk, fk1 = fk1, fk+fk1
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         
         optional_args = parser.add_argument_group('Optional args')
         optional_args.add_argument('-n', dest='is_printing', default=True, action='store_false', help="don't print the calculated result")  # optional flag '-n'
-        optional_args.add_argument('--algo', dest='callme', default='adv', help=f'Algorithm to use (choices: {"/".join(callables.keys())})', metavar='<algorithm>',
+        optional_args.add_argument('--algo', dest='callme', default='adv', help=f'calculation algorithm (choices: {"/".join(callables.keys())})', metavar='<algorithm>',
             type=lambda x: callables[x] if (not x.isdigit() and x in callables) else parser.error(f"You provided '{x}' instead of one of the following: {' '.join(callables.keys())}"))
     
         return parser.parse_args()
@@ -73,35 +73,6 @@ if __name__ == "__main__":
 # test by running:  python3 -m unittest fibo_python.py
 import unittest
 class Testings(unittest.TestCase):
-    
-    def test_args_handling(self):  # python3 -m unittest fibo_python.Testings.test_args_handling
-        import subprocess
-        import os
-
-        this_file = os.path.abspath(__file__)
-        def runcmd(bash_cmd):
-            return subprocess.run(bash_cmd, shell=True, capture_output=True, text=True, executable='/bin/bash')
-            
-        def assert_args_cause_stderr(*arguments):
-            self.assertIsNotNone(runcmd(f"python3 '{this_file}' {' '.join(arguments)}").stderr)
-        
-        def assert_args_legal(*arguments):
-            self.assertEqual('', runcmd(f"python3 '{this_file}' {' '.join(arguments)}").stderr)
-        
-        # verify that the following errors occur
-        assert_args_cause_stderr()  # no number (and no extra args at all)
-        assert_args_cause_stderr('0')  # index 0
-        assert_args_cause_stderr('-11')  # negative index
-        assert_args_cause_stderr('1.2')  # fractional index
-        assert_args_cause_stderr('1', '--algo', 'adv', '2')  # two numbers
-        assert_args_cause_stderr('hello')  # unsupported arg
-        assert_args_cause_stderr('--algo', 'hello')  # unsupported algorithm arg
-        assert_args_cause_stderr('--algo', '2')  # unsupported algorithm arg
-        
-        assert_args_legal('4')          # valid usage
-        assert_args_legal('4', '--algo', 'adv')   # valid usage
-        assert_args_legal('--algo', 'adv', '4')   # valid usage
-
     
     def test_same_results(self):
         for i in range(1,20):

@@ -2,13 +2,29 @@
 
 problem=fibonacci
 
-# compile if necessary
-py_program="$(find "$problem/" -type f -name "*.py")"
+
+
+# Setup (finding programs and compiling)
+# ======================================
+
+py_program="$(find "$problem/" -type f -name "fibo*.py")"
 [ -n "$py_program" ] || { echo "couldn't find the python file, fix this"; exit 1; }
 
-pyc_program="$(find "$problem/" -type f -name "*.pyc")"
-[ -n "$pyc_program" ] || { python -m compileall "$py_program" && pyc_program="$(find "$problem/" -type f -name "*.pyc")"; }  # compile, if it's not there
-[ -n "$pyc_program" ] || { echo "couldn't compile the python file (didn't find the compiled file), fix it"; exit 1; }  # still not there?
+pyc_program="$(find "$problem/" -type f -name "fibo*.pyc")"
+[ -n "$pyc_program" ] || { python -m compileall "$py_program" && pyc_program="$(find "$problem/" -type f -name "fibo*.pyc")"; }  # compile, if it's not there
+[ -n "$pyc_program" ] || { echo "couldn't compile the python file (didn't find the compiled file after compilation), fix it"; exit 1; }  # still not there?
+
+
+c_program="$(find "$problem/" -type f -name "fibo*.c")"
+[ -n "$c_program" ] || { echo "couldn't find the c source-code file, fix this"; exit 1; }
+
+# Recompile and overwrite the C binaries. Unlike python, C compilation args are very impactful on performance, so we make sure to use the right settings
+gcc -O3 -m64 "$c_program" -lgmp -o "${c_program%.c}.bin"  # -03 is optimization for speed, -lgmp is GNU library "gmp" for large numbers
+ccompiled_program="$(find "$problem/" -type f -name "fibo*c.bin")"
+
+[ -n "$ccompiled_program" ] || { echo "couldn't compile the c file (didn't find the compiled file after compilation), fix it"; exit 1; }  # still not there?
+
+
 
 
 # Run Programs
