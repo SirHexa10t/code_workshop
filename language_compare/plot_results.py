@@ -30,6 +30,16 @@ def golden_angle_color_generator():
         yield colorsys.hsv_to_rgb(hue % 1.0, 1.0, 1.0)
         hue += golden_angle
 
+def marker_generator():
+    markers = [
+        ".", ",", "o", "v", "^", "<", ">", "1", "2", "3", "4", 
+        "s", "p", "*", "h", "H", "+", "x", "D", "d", "|", "_"
+    ]
+    i = 0
+    while True:
+        yield markers[i]
+        i=(i+1) % len(markers)
+
 
 with open(sys.argv[1], 'r') as file:
     title = file.readline().strip()
@@ -45,9 +55,9 @@ with open(sys.argv[1], 'r') as file:
 
 plt.figure(figsize=(10, 5))
 color_gen = golden_angle_color_generator()
-for dataset in datasets:
-    color = next(color_gen)
-    plt.plot(dataset.get_x_values(), dataset.get_y_values(), marker='o', label=dataset.label, color=color)
+markers_gen = marker_generator()
+for dataset in sorted(datasets, key=lambda x: x.label):  # insert by alphabetical order of labels
+    plt.plot(dataset.get_x_values(), dataset.get_y_values(), marker=next(markers_gen), markersize=10, markeredgecolor='black', label=dataset.label, color=next(color_gen))
 
 plt.xlabel(f"Logarithmic {x_axis}")
 plt.ylabel(f"Logarithmic {y_axis}")
