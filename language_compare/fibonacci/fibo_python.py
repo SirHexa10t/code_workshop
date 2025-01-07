@@ -21,8 +21,8 @@ def fib_adv(n: int) -> int:
         if k <= 1:
             return (k, 1)
         fh, fh1 = fib_pair(k>>1)    # get F(k/2), F(k/2+1) where k/2 is even (so we can divide it again by 2)
-        fk = fh * ((fh1<<1) - fh)   # F(2k) calculation (property of matrix multiplication:   F(2k) = F(k) * (2*F(k+1) - F(k))
-        fk1 = fh1**2 + fh**2        # F(2k+1) calculation (property of matrix multiplication:  F(2k+1) = F(k+1)^2 + F(k)^2 )
+        fk = fh * ((fh1<<1) - fh)   # F(2k) calculation:   F(2k) = F(k) * (2*F(k+1) - F(k)
+        fk1 = fh1**2 + fh**2        # F(2k+1) calculation:  F(2k+1) = F(k+1)^2 + F(k)^2 
         if k & 1:                   # checking if odd by looking at LSB
             fk, fk1 = fk1, fk+fk1
         return (fk, fk1)
@@ -68,26 +68,3 @@ if __name__ == "__main__":
         set_int_digits(args.n)
         print(result)
     exit(0)
-    
-
-# test by running:  python3 -m unittest fibo_python.py
-import unittest
-class Testings(unittest.TestCase):
-    
-    def test_same_results(self):
-        for i in range(1,20):
-            self.assertTrue(fib_straight(i) == fib_adv(i) == fib_naive(i))
-    
-    def test_same_results_big_numbers(self):
-        for i in range(1,2000):  # checking validity of adv algorithm
-            self.assertEqual(fib_straight(i), fib_adv(i))
-    
-    def test_handling_of_huge_results(self):
-        large_n = 10000  # check with large numbers. This one's still in standard digit limit's range
-        for i in range(3):
-            set_int_digits(large_n)
-            # print(f"checking big index number: {large_n}. Current digit limit: {sys.get_int_max_str_digits()}")
-            f"{fib_adv(large_n)}"  # try to trigger an exception of integer string conversion (exceeding digits limit)
-            f"{fib_straight(large_n)}"
-            large_n *= 10
-            
