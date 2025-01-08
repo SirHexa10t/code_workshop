@@ -1,6 +1,9 @@
 
-*.pyc
-
 *.png
+
+# allow png (only) in md_imgs dir
+!*/md_imgs/*.png  
+
+*.pyc
 
 *.bin
