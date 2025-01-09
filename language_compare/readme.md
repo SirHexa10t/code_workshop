@@ -6,8 +6,9 @@ This section of the project is comparing runtime between different languages.
 The used code is written from-scratch, for "authentic" results. Also no writing code that's uncharacteristic to the language - only typical usage, without rule-bending:
 * Python is written concisely
 * C is written responsibly and with the important optimizations in mind
+* Java is written with objects and streams
 * Rust is written as if trying to prove a point
-* Bash is written like it's just for fun
+* Bash is written as a string processor
 * \<the language you hate\> is written like the piece of shit that it is
 
 ## What kind of info can I get from it?
@@ -30,7 +31,7 @@ How about nice-looking graphs?
 
 Take it or leave it, it's all I have to offer.
 
-![comparison_python_and_c](md_imgs/10s_limit.png)
+![comparison_python_and_c](md_imgs/120s_limit.png)
 ###### "Fibonacci calculation time" - log-graph of how long it takes to calculate at how far an index
 Notice the scale. This simple task requires little sophistication. No classes or complicated data management, just raw single-threaded performance.
 * C is almost 100 times faster than Python
@@ -38,7 +39,7 @@ Notice the scale. This simple task requires little sophistication. No classes or
 * Exponential-time algorithms won't get you far, no matter the language
 * Running a binary file is slightly but constantly faster than running in some language's container shell
 * You won't see a difference between the smart (logarithmic) solution and the simple (linear) straight-forward one until you're in the magnitude of n=10k 
-
+* Bash needs to use strings instead of numbers because of its number limitation (2^63-1), but its start time is short, so it can be better than Python in case you want to run something small many times
 
 
 This is a work in progress, more will be added. Hopefully.

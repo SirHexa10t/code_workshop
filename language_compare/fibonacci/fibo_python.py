@@ -21,7 +21,7 @@ def fib_adv(n: int) -> int:
         if k <= 1:
             return (k, 1)
         fh, fh1 = fib_pair(k>>1)    # get F(k/2), F(k/2+1) where k/2 is even (so we can divide it again by 2)
-        fk = fh * ((fh1<<1) - fh)   # F(2k) calculation:   F(2k) = F(k) * (2*F(k+1) - F(k)
+        fk = fh * ((fh1<<1) - fh)   # F(2k) calculation:   F(2k) = F(k) * (2*F(k+1) - F(k))
         fk1 = fh1**2 + fh**2        # F(2k+1) calculation:  F(2k+1) = F(k+1)^2 + F(k)^2 
         if k & 1:                   # checking if odd by looking at LSB
             fk, fk1 = fk1, fk+fk1

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from dataclasses import dataclass
 import colorsys
 
+SIMILAR_ENTRY_GROUPSIZE = 3  # every this often the entries would be dis-similar (different kind), meriting a new marker
+
 @dataclass
 class Dataset:
     label: str
@@ -31,14 +33,19 @@ def golden_angle_color_generator():
         hue += golden_angle
 
 def marker_generator():
-    markers = [
-        ".", ",", "o", "v", "^", "<", ">", "1", "2", "3", "4", 
-        "s", "p", "*", "h", "H", "+", "x", "D", "d", "|", "_"
+    # markers = [
+    #     ".", ",", "o", "v", "^", "<", ">", "1", "2", "3", "4", 
+    #     "s", "p", "*", "h", "H", "+", "x", "D", "d", "|", "_"
+    # ]
+    distinct_markers = [  # easier to distinguish
+        ".", ",", "o", ">",
+        "s", "*", "+", "d"
     ]
     i = 0
     while True:
-        yield markers[i]
-        i=(i+1) % len(markers)
+        for j in range(SIMILAR_ENTRY_GROUPSIZE):
+            yield distinct_markers[i]
+        i=(i+1) % len(distinct_markers)
 
 
 with open(sys.argv[1], 'r') as file:

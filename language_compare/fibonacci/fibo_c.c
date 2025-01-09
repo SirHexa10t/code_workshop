@@ -72,13 +72,15 @@ void fib_adv(uint64_t n, bool is_printing)
     mpz_init_set_ui(ffk, 1);   // F(k)^2
     mpz_init_set_ui(ffk1, 1);  // F(k+1)^2
     mpz_init_set_ui(f2k1, 1);  // F(2k+1)
-    
+
     // create a number that we can iterate on its bits in reverse order
     uint64_t inverted_n = 0;
+    int bits_in_n = 0;  // count how many bits n has
     for (uint64_t n_copy = n ; n_copy > 0 ; n_copy >>= 1)
     {
         inverted_n <<= 1;
         if (n_copy & 1) inverted_n++;  // for every 1 we take out of n, we put one in its inversion (from the other direction)
+        bits_in_n++;
     }
     
     #ifdef TESTING  // only for development, don't compile with -DTESTING on the regular
@@ -96,10 +98,10 @@ void fib_adv(uint64_t n, bool is_printing)
             }
         }
     #endif
-    
+
     // for each bit of inverted n (or: for each bit in n, from MSB to LSB), until (including) our location matches the original goal
     bool is_last_even = true;  // start on 0 digit beyond MSB (first bit will always be 1, so we know it'll flip in first iteration)
-    for (uint64_t n_copy = n ; n_copy > 0 ; n_copy >>= 1, inverted_n >>= 1)
+    for (int bitnum = 0 ; bitnum < bits_in_n ; bitnum++, inverted_n >>= 1)
     {
         //  F(2k+1)
         mpz_mul(ffk, fk, fk);      // F(k)^2
@@ -241,7 +243,7 @@ int print_usage(const char *prog_name, int status) {
         "-n                             don't print the calculated result\n"
         "--algo <naive/straight/adv>    calculation algorithm\n"
         "-h / --help                    print this message\n";
-    return fprintf(stderr, usage_message, prog_name), status; 
+    return fprintf(stdout, usage_message, prog_name), status; 
 }
 
 int main(int argc, char *argv[])

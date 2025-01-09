@@ -7,6 +7,9 @@ prob="${problem:0:4}"
 # Setup (finding programs and compiling)
 # ======================================
 
+sh_program="$(find "$problem/" -type f -name "$prob*.sh")"
+[ -n "$sh_program" ] || { echo "couldn't find the bash file, fix this"; exit 1; }
+
 py_program="$(find "$problem/" -type f -name "$prob*.py")"
 [ -n "$py_program" ] || { echo "couldn't find the python file, fix this"; exit 1; }
 
@@ -31,13 +34,13 @@ c_program="$(find "$problem/" -type f -name "$prob*c.bin")"
 
 n=1                         # index
 exponent_n=2                # index growth: n*2^x
-cutoff_time=10s            # after this time passes, the process is interrupted and removed from rerunning schedule
+cutoff_time=${1:-5}s        # after this time passes, the process is interrupted and removed from rerunning schedule (default if not arg1: 5s)
 
 declare -A progcmds
-progcmds['Python']="python3 $py_program "
-progcmds['CompiledPython']="python3 $pyc_program "
-progcmds['C']="$c_program "
-
+progcmds['Bash']="/bin/bash '$sh_program'"
+progcmds['Python']="python3 '$py_program' "
+progcmds['PythonCompiled']="python3 '$pyc_program' "
+progcmds['C']="'$c_program' "
 
 declare -A runconfs results
 for program in "${!progcmds[@]}"; do
@@ -55,13 +58,14 @@ while [ ${#runconfs[@]} -gt 0 ]; do
                 
         # run and measure time
         start_time=$(date +%s.%N)  # using 'time' to measure runtime proved problematic under the current circumstances
-        timeout "$cutoff_time" ${progcmds[$program]} "$n" --algo "$algo" '-n' &>/dev/null
+        timeout "$cutoff_time" $(echo "${progcmds[$program]}" | xargs -n 1 echo) "$n" --algo "$algo" '-n' &>/dev/null
         exit_status=$?
         end_time=$(date +%s.%N)
         if [ $exit_status -ne 0 ]; then
             case $exit_status in
+                9) { unset runconfs["$config"]; echo "Numbers became too big to handle in $problem input $n @ $config"; continue; } ;; # exceeded allowed runtime
                 124) { unset runconfs["$config"]; echo "Calculation time exceeded for $problem input $n @ $config"; continue; } ;; # exceeded allowed runtime
-                *) { echo "error when calculating on $program, n=$n, algorithm: $algo (fix it, I won't keep on running like that)"; exit 1; } ;;  # error in code
+                *) { echo "error when calculating on $problem input $n @ $config (fix it, I won't keep on running like that)"; exit 1; } ;;  # error in code
             esac
         fi
         timed=$(echo "$end_time - $start_time" | bc)
@@ -70,7 +74,8 @@ while [ ${#runconfs[@]} -gt 0 ]; do
         results[$config]+=" {\"$n\":\"$timed\"},"               # for graph drawing
     done
     
-    n=$((n * exponent_n))
+    # n=$((n * exponent_n))  # Don't calculate like that, you'll be limited in number range and loop back to negatives
+    n=$(echo "$n * $exponent_n" | bc)
 done
 
 
@@ -78,15 +83,11 @@ done
 # Draw graph
 # ==========
 
-# Define plot parameters
-title="$problem calculation time"
-y_axis="Execution Time (s)"
-x_axis="$problem Index"
-
+# First 3 lines in the graph are title and headers
 temp_file=$(mktemp)
-echo "$problem calculation time" >> "$temp_file"   # title
-echo "Execution Time (s)" >> "$temp_file"          # y_axis
-echo "$problem Index" >> "$temp_file"              # x_axis
+echo "$problem calculation time, limited to ${cutoff_time}" >> "$temp_file"     # title
+echo "Execution Time (s)" >> "$temp_file"                                       # y_axis
+echo "$problem Index" >> "$temp_file"                                           # x_axis
 
 for config in "${!results[@]}"; do
     trimmed="${results[$config]%,}"
