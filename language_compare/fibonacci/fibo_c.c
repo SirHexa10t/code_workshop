@@ -22,7 +22,8 @@
 
 
 0)   ->   A) F(k+1)*(F(k+1)-F(k)) = F(k+1)*F(k-1)
-B) F(k+1)*F(k-1) = F(k)^2 + (-1)^k         Catalan's identity
+B) F(k+1)F(k-1) = F(k)^2 + (-1)^k         Catalan's identity
+    F(k+2)F(k) = F(k+1)^2 - (-1)^k
 
 B' (F(k+2)-F(k))*(F(k+1)-F(k))
 B) & 0) -> Bx) (F(k+1)-F(k)) * F(k+1) = F(k)^2 + (-1)^k   ->   F(k)^2 = F(k+1)*(F(k+1)-F(k)) - (-1)^k
@@ -43,7 +44,7 @@ D) & B)  ->  F(k+1)^2 - F(k+1)*F(k) = F(k)^2 + (-1)^k
 F(k+1)*F(k) - F(k)F(k-1) = F(k+1)*F(k) - F(k-1)F(k) = F(k+1)*F(k) - F(k-1)F(k) = (F(k+1)-F(k-1))*F(k) = F(k)^2
         ->  G) F(k)F(k-1) = F(k+1)*F(k) - F(k)^2
 
-1B & G) -> F(2k) = F(k+1)^2 - (-1)^k + F(k+1)*F(k) - F(k)^2 - F(k)^2 = F(k+1)^2 + F(k+1)*F(k) - 2*F(k)^2 - (-1)^k
+1B & G) -> C) F(2k) = F(k+1)^2 - (-1)^k + F(k+1)*F(k) - F(k)^2 - F(k)^2 = F(k+1)^2 + F(k+1)*F(k) - 2*F(k)^2 - (-1)^k
 
 0)            -> 3)  2*F(k+1) - F(k) = F(k+1) + F(k-1) 
 1) & 0) & 3)  -> 4)  F(2k) = F(k) * (2*F(k+1) - F(k)) = (F(k+1)-F(k-1))*(2*F(k+1)-F(k)) = (F(k+1)-F(k-1))*(F(k+1)+F(k-1)) = F(k+1)^2 - F(k-1)^2   Cassini's identity
@@ -57,6 +58,81 @@ F(k+1)*F(k) - F(k)F(k-1) = F(k+1)*F(k) - F(k-1)F(k) = F(k+1)*F(k) - F(k-1)F(k) =
 0) & 1) & 2) -> F(2k+2) = F(2k+1)+F(2k) = F(k+1)^2+F(k)^2 + F(k)*(2*F(k+1)-F(k)) = F(k+1)^2 + 2F(k+1)*F(k) + 0*F(k)^2 = F(k+1)*(2*F(k)+F(k+1))
     but also 1) -> F(2k+2) = F(k+1) * (2*F(k+2) - F(k+1)) , so F(k+1)*(2*F(k)+F(k+1)) = F(k+1)*(2*F(k+2)-F(k+1)), so:
     2*F(k)+F(k+1) = 2*F(k+2)-F(k+1)
+    
+    
+Y) F(2k+2) = F(2k+1) + 2*F(k+1)F(k) - F(k)^2   // I don't remember how I got this formula. "It just works" -Todd Howard
+
+2) + C)  ->  X) F(2k+2) = F(2k+1) + F(2k) = 2*F(k+1)^2 - F(k)^2 + F(k+1)*F(k) - (-1)^k
+Y) = X)  ->  F(2k+1) + 2F(k+1)F(k) - F(k)^2 = 2F(k+1)^2 - F(k)^2 + F(k+1)F(k) - (-1)^k
+            -> Z) F(2k+1) = 2F(k+1)^2 - F(k+1)F(k) - (-1)^k
+
+2) = Z)  -> 2F(k+1)^2 - F(k+1)F(k) - (-1)^k = F(k+1)^2 + F(k)^2
+            -> Z2) F(k+1)^2 = F(k+1)F(k) + F(k)^2 + (-1)^k   reacehd the same result again
+            
+Z2) k-1  -> F(k)^2 = F(k)F(k-1) + F(k-1)^2 - (-1)^k
+    isolate  F(k-1)^2  -> Z3) F(k-1)^2 = F(k)^2 - F(k)F(k-1) + (-1)^k = F(k)^2 - F(k)(F(k+1)-F(k)) + (-1)^k = 2F(k)^2 - F(k+1)F(k) + (-1)^k
+
+
+F(k+2)F(k+1) = F(k+1)^2 + F(k+1)F(k) = F(k+1)^2 + F(k+1)(F(k+1)-F(k-1)) = 2*F(k+1)^2 - F(k+1)F(k-1) -> catalan -> F(k+2)F(k+1) = 2*F(k+1)^2 - F(k)^2 - (-1)^k
+
+
+F(k+1)^2 = F(k+1)F(k) + F(k)^2 + (-1)^k = F(k+1)^2 - F(k+1)F(k-1) + F(k)^2 + (-1)^k 
+    -> - F(k+1)F(k-1) + F(k)^2 + (-1)^k = 0 -> F(k+1)F(k-1) = F(k)^2 + (-1)^k      reached catalan's identity again
+    
+F(2k) = 2*F(k+1)F(k) - F(k)^2
+  -> F(2k+2) = 2*F(k+2)F(k+1) - F(k+2)^2 = 2*(F(k+1)+K(k))*F(k+1) - F(k+2)^2 = 2*F(k+1)^2 + 2*F(k+1)F(k) - F(k+2)^2
+F(2k) = F(k+1)^2 + F(k+1)*F(k) - 2*F(k)^2 - (-1)^k
+  -> F(2k+2) = F(k+2)^2 + F(k+2)F(k+1) - 2*F(k+1)^2 + (-1)^k = F(k+2)^2 - F(k+1)^2 + F(k+1)F(k) + (-1)^k = F(k+1)^2 + 2F(k+1)F(k) + F(k)^2 - F(k+1)^2 + F(k+1)F(k) + (-1)^k
+    = 3F(k+1)F(k) + F(k)^2 + (-1)^k
+F(2k) = F(k+1)^2 - F(k-1)^2       Cassini's
+F(2k+1) = F(k+1)^2 + F(k)^2
+  ->> F(2k+2) = F(2k+1) + F(2k) = F(k+1)^2 + F(k)^2 + 2*F(k+1)F(k) - F(k)^2 = F(k+1)^2 + 2*F(k+1)F(k)
+F(2k+2) = F(k+2)^2 - F(k)^2       Cassini's
+    -> = 2*F(k+1)^2 + 2*F(k+1)F(k) - F(k+2)^2  ->  2*F(k+2)^2 = 2*F(k+1)^2 + 2*F(k+1)F(k) + F(k)^2
+F(2k+2) = F(2k+1) + 2*F(k+1)F(k) - F(k)^2 = (F(k+1)^2 + F(k)^2) + 2*F(k+1)F(k) - F(k)^2 = F(k+1)^2 + 2*F(k+1)F(k)
+
+F(2k+2) = F(k+1)^2 + 2*F(k+1)F(k)
+-
+F(2k) = 2*F(k+1)F(k) - F(k)^2
+=
+F(2k+1) = F(k+1)^2 + F(k)^2     got 2) again
+
+
+F(n-1)
+F(n)   has F(n) 1 time  , F(n-1) 0 times
+F(n+1) has F(n) 1 times , F(n-1) 1 times
+F(n+2) has F(n) 2 times , F(n-1) 1 times
+F(n+3) has F(n) 3 times , F(n-1) 2 times  <- each new row is the sum of the previous 2 rows (which is fibo growth)
+F(n+4) has F(n) 5 times , F(n-1) 3 times
+F(n+m) has F(n) `F(m+1)` times, F(n-1) `F(m)` times
+F(2n) has F(n) `F(n+1)` times, F(n-1) `F(n)` times
+  -> F(2k-1) = F(k)*F(k) + F(k-1)*F(k-1)
+  -> F(2k) = F(k)*F(k+1) + F(k-1)*F(k)
+    -> F(2k+2) = F(k+1)*F(k+2) + F(k)*F(k+1)
+      -> F(2k+1) = F(2k+2) - F(2k) =  F(k+1)*F(k+2) - F(k-1)*F(k) = F(k+1)^2 + F(k+1)F(k) - F(k-1)*F(k) = F(k+1)^2 + F(k)*(F(k+1)-F(k-1)) = F(k+1)^2 + F(k)^2
+  -> F(2k+1) = F(k)*F(k+2) + F(k-1)*F(k+1) = F(k+2)F(k) + F(k)^2 + (-1)^k = (F(k+1)^2 - (-1)^k)) + F(k)^2 + (-1)^k  same as above
+  -> F(2k+2) = F(k)*F(k+3) + F(k-1)*F(k+2)
+  -> F(3k-1) = F(k)*F(2k) + F(k-1)*F(2k-1)
+  -> F(3k) = F(k)*F(2k+1) + F(k-1)*F(2k)   =   F(k)(F(2k+2)-F(2k)) + (F(k+1)-F(k))*F(2k) = F(2k+2)F(k) - 2*F(2k)F(k) + F(2k)F(k+1) = (F(2k+2)-2F(2k))F(k) + F(2k)F(k+1)
+    = (F(2k+1)-F(2k))F(k) + F(2k)F(k+1) = (F(k+1)^2 + F(k)^2 - F(2k))F(k) + F(2k)F(k+1) = (F(k+1)^2 + F(k)^2 - (2*F(k+1)F(k) - F(k)^2) )F(k) + (2*F(k+1)F(k) - F(k)^2)F(k+1) =
+    = 3*F(k+1)^2*F(k) + 2F(k)^3 - 3*F(k+1)F(k)^2  =  3*F(k+1)F(k)( F(k+1)-F(k) ) + 2F(k)^3 = 3*F(k+1)F(k)F(k-1) + 2F(k)^3 =  3*F(k)*(F(k)^2 + (-1)^k) + 2F(k)^3
+    = 5*F(k)^3 + (-1)^k*3*F(k) 
+  -> F(3k+1) = F(k)*F(2k+2) + F(k-1)*F(2k+1) = F(k)*(F(2k+1)+F(2k)) + F(k-1)*(F(2k)+F(2k-1)) = F(k)*F(2k+1) + F(k)*F(2k) + F(k-1)*F(2k) + F(k-1)*F(2k-1)
+             = F(3k) + F(k)*F(2k) + F(k-1)*F(2k-1) = F(3k) + F(k)^2 * (F(k+1)+F(k-1)) + F(k-1)*(F(k)^2 + F(k+1)^2) = F(3k) + 
+  -> F(4k) = F(k)*F(3k+1) + F(k-1)*F(3k)
+  
+  
+  From F(3k)'s identity:  (which is quite incredible as we can use only one index to calculate onwards)
+    F(9k) = 5*F(3k)^3 + (-1)^k*3*F(3k) =   
+        = ... = 625F(k)^9 + (-1)^k*1125F(k)^7 + 675(k)^5 + (-1)^k*150F(k)^3 + (-1)^k*9F(k)
+    
+    
+    5F(k)*( 5*F(k)^2 + (-1)^k*3 )^3  + (-1)^k*3F(k)*( 5*F(k)^2 + (-1)^k*3 )
+          = 5F(k)*( 125*F(k)^6 + 3*25*F(k)^4*(-1)^k*3 + 3*5*F(k)^2*9 + (-1)^k*27 ) + (-1)^k*15F(k)^3 + 3*3F(k)
+          = 5F(k)*( 125*F(k)^6 + (-1)^k*225*F(k)^4 + 135*F(k)^2 + (-1)^k*27 ) + (-1)^k*15F(k)^3 + 3*3F(k)
+          = 625*F(k)^7 + (-1)^k*1125*F(k)^5 + 675*F(k)^3 + (-1)^k*135*F(k) + (-1)^k*15F(k)^3 + 9*F(k)
+          = (-1)^k*(1125*F(k)^5 + 15*F(k)^3 + 135*F(k)) + 625*F(k)^7 + 675*F(k)^3 + 9*F(k)
+          
 */
 
 
@@ -65,10 +141,11 @@ F(k+1)*F(k) - F(k)F(k-1) = F(k+1)*F(k) - F(k-1)F(k) = F(k+1)*F(k) - F(k-1)F(k) =
 // Basically we're multiplying by 2 and adding 1 according to the binary representation of the sought index
 void fib_adv(uint64_t n, bool is_printing)
 {
-    mpz_t fk, fk1, fk1k, ffk, ffk1, f2k1;
+    mpz_t fk, fk1, fk1k, twofk1k, ffk, ffk1, f2k1;
     mpz_init_set_ui(fk, 0);    // F(k)  // at index 0, but we start from index 1, so we'll never get back 0
     mpz_init_set_ui(fk1, 1);   // F(k+1)
     mpz_init_set_ui(fk1k, 1);  // F(k+1)F(k)
+    mpz_init_set_ui(twofk1k, 1);  // 2*F(k+1)F(k)
     mpz_init_set_ui(ffk, 1);   // F(k)^2
     mpz_init_set_ui(ffk1, 1);  // F(k+1)^2
     mpz_init_set_ui(f2k1, 1);  // F(2k+1)
@@ -110,7 +187,8 @@ void fib_adv(uint64_t n, bool is_printing)
         mpz_add(ffk1, fk1k, ffk);  // F(k+1)F(k) + F(k)^2
         if(is_last_even) mpz_add_ui(ffk1, ffk1, 1); else mpz_sub_ui(ffk1, ffk1, 1);  // F(k+1)^2 = F(k+1)*F(k) + F(k)^2 + (-1)^k
         mpz_add(f2k1, ffk1, ffk);  // F(2k+1) = F(k+1)^2 + F(k)^2
-        
+        mpz_add(twofk1k, fk1k, fk1k);  // 2*F(k+1)F(k)
+         
         // at this point, it'd be good to make no mure multiplications.
         // Available values are: F(k), F(k+1), F(k)^2 , F(k+1)F(k) , F(2k+1)
         
@@ -119,10 +197,9 @@ void fib_adv(uint64_t n, bool is_printing)
         {
             //  F(k+1) <- F(2k+2)
             // F(2k+2) = F(2k+1) + 2*F(k+1)F(k) - F(k)^2   // I don't remember how I got this formula. "It just works" -Todd Howard
+            // F(2k+2) = F(k+1)^2 + 2*F(k+1)F(k)  // shorter
             // Could also run longer through Cassini's:  F(2k+2) = F(k+2)^2 - F(k)^2
-            mpz_add(fk1, fk1k, fk1k);   // 2*F(k+1)F(k)
-            mpz_add(fk1, f2k1, fk1);    // F(2k+1) + 2*F(k+1)F(k)
-            mpz_sub(fk1, fk1, ffk);     // F(2k+2) = F(2k+1) + 2*F(k+1)F(k) - F(k)^2
+            mpz_add(fk1, ffk1, twofk1k);    // F(2k+2) = F(k+1)^2 + 2*F(k+1)F(k)
             
             //  F(k) <- F(2k+1)
             mpz_swap(fk, f2k1);
@@ -134,10 +211,8 @@ void fib_adv(uint64_t n, bool is_printing)
             //  F(k) <- F(2k)
             // F(2k) = F(k+1)^2 + F(k+1)*F(k) - 2*F(k)^2 - (-1)^k  // a mix of various; Catalan's, Cassini's, and some of mine.
             // Could also run longer through Cassini's:  F(2k) = F(k+1)^2 - F(k-1)^2
-            mpz_add(fk, ffk, ffk);                                               // 2*F(k)^2
-            mpz_sub(fk, fk1k, fk);                                               // F(k+1)*F(k) - 2*F(k)^2
-            mpz_add(fk, ffk1, fk);                                               // F(k+1)^2 + F(k+1)*F(k) - 2*F(k)^2
-            if(is_last_even) mpz_sub_ui(fk, fk, 1); else mpz_add_ui(fk, fk, 1);  // - (-1)^k
+            // or back to F(2k) = 2*F(k+1)F(k) - F(k)^2
+            mpz_sub(fk, twofk1k, ffk);    // F(2k) = 2*F(k+1)F(k) - F(k)^2
 
             //  F(k+1) <- F(2k+1)
             mpz_swap(fk1, f2k1);
@@ -181,6 +256,7 @@ void fib_adv(uint64_t n, bool is_printing)
     mpz_clear(fk1);
     mpz_clear(ffk);
     mpz_clear(fk1k);
+    mpz_clear(twofk1k);
     mpz_clear(ffk1);
     mpz_clear(f2k1);
 }

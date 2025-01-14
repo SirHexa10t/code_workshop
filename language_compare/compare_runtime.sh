@@ -1,6 +1,7 @@
 #!/bin/bash
 
 problem=fibonacci
+difficulty='memory allocation and big number multiplication'
 prob="${problem:0:4}"
 
 
@@ -27,14 +28,14 @@ c_program="$(find "$problem/" -type f -name "$prob*c.bin")"
 [ -n "$c_program" ] || { echo "couldn't compile the c file (didn't find the compiled file after compilation), fix it"; exit 1; }  # still not there?
 
 
-
+# javac  --enable-preview --release 21 fibo_java.java  # enabling preview features of JDK21
 
 # Run Programs
 # ============
 
 n=1                         # index
 exponent_n=2                # index growth: n*2^x
-cutoff_time=${1:-5}s        # after this time passes, the process is interrupted and removed from rerunning schedule (default if not arg1: 5s)
+cutoff_time=${1:-1}s        # after this time passes, the process is interrupted and removed from rerunning schedule (default if not arg1: 5s)
 
 declare -A progcmds
 progcmds['Bash']="/bin/bash '$sh_program'"
@@ -75,7 +76,7 @@ while [ ${#runconfs[@]} -gt 0 ]; do
     done
     
     # n=$((n * exponent_n))  # Don't calculate like that, you'll be limited in number range and loop back to negatives
-    n=$(echo "$n * $exponent_n" | bc)
+    n=$(bc <<< "$n * $exponent_n" | tr -cd '0-9')
 done
 
 
@@ -85,9 +86,9 @@ done
 
 # First 3 lines in the graph are title and headers
 temp_file=$(mktemp)
-echo "$problem calculation time, limited to ${cutoff_time}" >> "$temp_file"     # title
-echo "Execution Time (s)" >> "$temp_file"                                       # y_axis
-echo "$problem Index" >> "$temp_file"                                           # x_axis
+title="$problem calculation time (testing $difficulty). Time limit: ${cutoff_time}"  # title
+y_label="Execution Time (s)"                                                         # y_axis
+x_label="$problem Index"                                                             # x_axis
 
 for config in "${!results[@]}"; do
     trimmed="${results[$config]%,}"
@@ -95,7 +96,7 @@ for config in "${!results[@]}"; do
 done
 
 # cat "$temp_file"
-python3 ./plot_results.py "$temp_file"
+python3 ./plot_results.py --title "$title" --x_label "$x_label" --y_label "$y_label" --data_file "$temp_file"
 
 rm "$temp_file"  # cleanup
 

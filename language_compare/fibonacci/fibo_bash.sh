@@ -3,19 +3,22 @@
 function errcho () { echo "$@" >&2 ; }
 function err_2_args () { errcho "you tried to set $1 more than once"; exit 1; }
 
-function _mul () { local r=$(printf "%s * " "$@" | sed 's/...$//'); echo "$r" | bc; }  # add ' * ' after each arg, then remove the last 3 chars, then calculate
-function _sub () { local r=$(printf "%s - " "$@" | sed 's/...$//'); echo "$r" | bc; }  # add ' - ' after each arg, then remove the last 3 chars, then calculate
-function _add () { local r=$(printf "%s + " "$@" | sed 's/...$//'); echo "$r" | bc; }  # add ' + ' after each arg, then remove the last 3 chars, then calculate
+function bc_parsed () { bc <<< "$@" | tr -cd '0-9'; }
+
+# add operations in between, then calculate, then remove the segmenting "\ \n" by keeping only numbers
+function _mul () { bc_parsed "$(printf "%s * " "$@" | sed 's/...$//')" ; }  # add ' * ' after each arg, then remove the last 3 chars, then calculate
+function _sub () { bc_parsed "$(printf "%s - " "$@" | sed 's/...$//')" ; }  # add ' - ' after each arg, then remove the last 3 chars, then calculate
+function _add () { bc_parsed "$(printf "%s + " "$@" | sed 's/...$//')" ; }  # add ' + ' after each arg, then remove the last 3 chars, then calculate
 
 function fib_adv () {
-    [[ $((n > 326)) -eq 1 ]] && { errcho "Bash on straight method can't calculate above fib[326]. You required index: $n. Sorry."; return 9; }
+    # [[ $((n > 326)) -eq 1 ]] && { errcho "Bash on straight method can't calculate above fib[326]. You required index: $n. Sorry."; return 9; }
 
     local trailing=0 leading=1  # at indexes k, k+1
-    local binary=$(echo "obase=2;$1" | bc)  # binary representation, we'll read it from MSB
+    local binary=$(bc_parsed "obase=2;$1")  # binary representation, we'll read it from MSB
     while [[ -n "$binary" ]] ; do
         # double k, the climbing index
-        local temp=$(echo "$leading * $leading + $trailing * $trailing " | bc)  # F(2k+1) = F(k+1)^2 + F(k)^2 
-        trailing=$( echo "$trailing * ( 2 * $leading - $trailing )" | bc )  # F(2k) = F(k) * (2*F(k+1) - F(k)  # Can also do Cassini's: F(2K) = F(k+1)^2 - F(k-1)^2
+        local temp=$(bc_parsed "$leading * $leading + $trailing * $trailing ")  # F(2k+1) = F(k+1)^2 + F(k)^2 
+        trailing=$( bc_parsed "$trailing * ( 2 * $leading - $trailing )" )  # F(2k) = F(k) * (2*F(k+1) - F(k)  # Can also do Cassini's: F(2K) = F(k+1)^2 - F(k-1)^2
         leading="$temp"
         [[ "${binary:0:1}" == '1' ]] && { leading=$( _add $leading $trailing); trailing=$(_sub $leading $trailing); }  # progress indexes by another step
 
@@ -25,7 +28,7 @@ function fib_adv () {
 }
 
 function fib_straight () {
-    [[ $((n > 327)) -eq 1 ]] && { errcho "Bash on straight method can't calculate above fib[327]. You required index: $n"; return 9; }
+    # [[ $((n > 327)) -eq 1 ]] && { errcho "Bash on straight method can't calculate above fib[327]. You required index: $n"; return 9; }
     local trailing=1 leading=1 i
     for i in $(seq 3 $n); do
         leading=$( _add $leading $trailing)  # leading = leading+trailing
@@ -36,9 +39,7 @@ function fib_straight () {
 
 function fib_naive () {
     [ "$1" -gt 1 ] || { echo "$1"; return; }
-    kminus1=$(fib_naive $(_sub "$1" 1))
-    kminus2=$(fib_naive $(_sub "$1" 2))
-    echo "$(_add "$kminus1" "$kminus2")"
+    _add "$(fib_naive $(_sub "$1" 1))" "$(fib_naive $(_sub "$1" 2))"  # add up index -1 and index -2
 }
 
 
@@ -97,7 +98,7 @@ function mymain () {
     # from index 93 onward, Bash's number system can't handle the big numbers (even bc can't look at it as a number, and that's the program that generated it!)
     # if echo "$result > 0" | bc; then errcho "result was too big, got '$result', it looped back into negatives!"; exit 9; fi
     
-    [ -z "$no_print" ] && cat "$temp_file"
+    [ -z "$no_print" ] && echo "$(cat "$temp_file")"  # extra echo at the end for newline
     rm "$temp_file"
 
     exit 0  # crucial!!! The last command we run can return 1 and it'd be fine by us, but this wouldn't mean we want the whole script to return 1!

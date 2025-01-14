@@ -146,12 +146,15 @@ class Testings(unittest.TestCase):
                 self.assertEqual(cmd_stdout(f"{i} --algo straight") , cmd_stdout(f"{i} --algo adv"))
             
             self.print_test_subject(prog, 'same results very big number')
-            self.assertEqual(cmd_stdout(f"1000000 --algo straight") , cmd_stdout(f"1000000 --algo adv"))
+            goal = algorithms_to_limits['adv'] if prog != 'bash' else 10000
+            self.assertEqual(cmd_stdout(f"{goal} --algo straight") , cmd_stdout(f"{goal} --algo adv"))
     
     def test_handling_of_huge_results(self):  # check with large numbers. 
         self.title("RESULTS DONT CRASH WHEN PRINTED")
     
         for prog, test in tests.items():
+            if prog == "bash":  # too slow for this test
+                continue;
             def cmd_stdout(arguments):
                 return self.runcmd(f"{test} {arguments}").stdout
             

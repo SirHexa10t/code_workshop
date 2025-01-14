@@ -7,3 +7,12 @@
 *.pyc
 
 *.bin
+
+.idea/
+
+out/
+
+
+*.jar
+
+*.class
