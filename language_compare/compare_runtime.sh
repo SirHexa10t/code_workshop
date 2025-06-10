@@ -1,40 +1,44 @@
 #!/bin/bash
 
+handle_sigint() { echo "Caught SIGINT, exiting."; exit 1; }
+trap handle_sigint SIGINT  # Trap SIGINT and call handle_sigint
+
+
 problem=fibonacci
-difficulty='memory allocation and big number multiplication'
 prob="${problem:0:4}"
+
+difficulty='memory allocation and big number multiplication'
+algos=('naive' 'straight' 'adv' 'surpass')
+
 
 
 # Setup (finding programs and compiling)
 # ======================================
 
-sh_program="$(find "$problem/" -type f -name "$prob*.sh")"
-[ -n "$sh_program" ] || { echo "couldn't find the bash file, fix this"; exit 1; }
+cd "$problem"  # basically doing this only because jar compilation is horrible without relocating
 
-py_program="$(find "$problem/" -type f -name "$prob*.py")"
-[ -n "$py_program" ] || { echo "couldn't find the python file, fix this"; exit 1; }
+function _find_src_file() { find . -type f -name "$prob*$1" | tee >(test $(wc -c) -gt 0 || { echo "couldn't find the $1 file, fix this"; exit 1; }); }
 
-pyc_program="$(find "$problem/" -type f -name "$prob*.pyc")"
-[ -n "$pyc_program" ] || { python -m compileall "$py_program" && pyc_program="$(find "$problem/" -type f -name "$prob*.pyc")"; }  # compile, if it's not there
-[ -n "$pyc_program" ] || { echo "couldn't compile the python file (didn't find the compiled file after compilation), fix it"; exit 1; }  # still not there?
+sh_program="$(_find_src_file '.sh')"
 
+py_program="$(_find_src_file '.py')"
+python3 -m compileall "$py_program"   &&   pyc_program="$(_find_src_file '.pyc')"  # compile python
 
-c_program="$(find "$problem/" -type f -name "$prob*.c")"
-[ -n "$c_program" ] || { echo "couldn't find the c source-code file, fix this"; exit 1; }
+c_program="$(_find_src_file '.c')"
+gcc -O3 -m64 "$c_program" -lgmp -o "${c_program%.c}.bin"   &&   c_program="$(_find_src_file 'c.bin')"  # -03 is optimization for speed, -lgmp is GNU library "gmp" for large numbers
 
-# Recompile and overwrite the C binaries. Unlike python, C compilation args are very impactful on performance, so we make sure to use the right settings
-gcc -O3 -m64 "$c_program" -lgmp -o "${c_program%.c}.bin"  # -03 is optimization for speed, -lgmp is GNU library "gmp" for large numbers
-c_program="$(find "$problem/" -type f -name "$prob*c.bin")"
-[ -n "$c_program" ] || { echo "couldn't compile the c file (didn't find the compiled file after compilation), fix it"; exit 1; }  # still not there?
+java_program="$(basename $(_find_src_file '.java'))"  # the ./ at the start messes up everything, must get rid of it
+# compile .class files with preview features of JDK21  # compile all .class files and choose the main class (named after its file) as the main
+javac --enable-preview --release 21 "$java_program"  &&  jar cfm "${java_program%.java}.jar" <(echo -e "Main-Class: ${java_program%.java}\n") fibo*.class  &&  chmod +x "${java_program%.java}.jar"  \
+  && java_program="$(_find_src_file '.jar')"
 
-
-# javac  --enable-preview --release 21 fibo_java.java  # enabling preview features of JDK21
+exit 0
 
 # Run Programs
 # ============
 
 n=1                         # index
-exponent_n=2                # index growth: n*2^x
+exponent_n=3                # index growth: n* exponent_n^(iterations)
 cutoff_time=${1:-1}s        # after this time passes, the process is interrupted and removed from rerunning schedule (default if not arg1: 5s)
 
 declare -A progcmds
@@ -42,10 +46,11 @@ progcmds['Bash']="/bin/bash '$sh_program'"
 progcmds['Python']="python3 '$py_program' "
 progcmds['PythonCompiled']="python3 '$pyc_program' "
 progcmds['C']="'$c_program' "
+progcmds['Java']="java -jar '$java_program' "
 
 declare -A runconfs results
 for program in "${!progcmds[@]}"; do
-    for algo in 'naive' 'straight' 'adv'; do 
+    for algo in ${algos[@]}; do 
         runconfs["${program}_${algo}"]="$algo"
         results["${program}_${algo}"]=''
     done
@@ -66,6 +71,7 @@ while [ ${#runconfs[@]} -gt 0 ]; do
             case $exit_status in
                 9) { unset runconfs["$config"]; echo "Numbers became too big to handle in $problem input $n @ $config"; continue; } ;; # exceeded allowed runtime
                 124) { unset runconfs["$config"]; echo "Calculation time exceeded for $problem input $n @ $config"; continue; } ;; # exceeded allowed runtime
+                130) { echo "process stopped by your keyboard interrupt, exiting"; exit 1; } ;;
                 *) { echo "error when calculating on $problem input $n @ $config (fix it, I won't keep on running like that)"; exit 1; } ;;  # error in code
             esac
         fi

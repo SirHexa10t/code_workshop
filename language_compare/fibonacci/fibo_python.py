@@ -2,16 +2,26 @@
 
 import sys  # necessary for checking number of in digits, and accepting argv
 
-def calc_necessary_digits(n):
-    """ approximate the number of digits nth number in Fibonacci has. Formula is: n*log10(phi) - log10(5)/2 """
-    log10phi = 0.208988       # math.log10(( 1 + math.sqrt(5) ) / 2) ; constant; no reason to recalculate every run
-    log10of5div2 = 0.349485   # math.log10(5)/2 ; constant; no reason to recalculate every run.
-    return int(n*log10phi - log10of5div2 + 1)  # floor and +1
+# def calc_necessary_digits(n):
+#     """ approximate the number of digits nth number in Fibonacci has. Formula is: n*log10(phi) - log10(5)/2 """
+#     log10phi = 0.208988       # math.log10(( 1 + math.sqrt(5) ) / 2) ; constant; no reason to recalculate every run
+#     log10of5div2 = 0.349485   # math.log10(5)/2 ; constant; no reason to recalculate every run.
+#     return int(n*log10phi - log10of5div2 + 1)  # floor and +1
 
-def set_int_digits(n):
-    needed = calc_necessary_digits(n)
+def set_int_digits(large_num):
+    import math
+    needed = math.floor(math.log10(large_num)) + 1
     if needed > sys.get_int_max_str_digits():
         sys.set_int_max_str_digits(needed)
+        
+        
+def fib_surpass(n: int) -> int:
+    i = 1
+    fib_i = 1;
+    while i < n:
+        fib_i = 5*fib_i**3 - 3*fib_i  # F(3k) = 5*F(k)^3 + (-1)^k*3*F(k) . Here, k is always odd, so there's no need to calculate (-1)*k
+        i *= 3  # k -> 3k
+    return fib_i
 
 # mentioned in this video:  https://www.youtube.com/watch?v=02rh1NjJLI4
 def fib_adv(n: int) -> int:
@@ -45,6 +55,7 @@ if __name__ == "__main__":
         'naive': fib_naive,
         'adv': fib_adv,
         'straight': fib_straight,
+        'surpass': fib_surpass
     }
         
     def parse_args():
@@ -65,6 +76,6 @@ if __name__ == "__main__":
     args = parse_args()
     result = args.callme(args.n)
     if args.is_printing:
-        set_int_digits(args.n)
+        set_int_digits(result)
         print(result)
     exit(0)

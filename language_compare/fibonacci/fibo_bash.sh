@@ -10,6 +10,23 @@ function _mul () { bc_parsed "$(printf "%s * " "$@" | sed 's/...$//')" ; }  # ad
 function _sub () { bc_parsed "$(printf "%s - " "$@" | sed 's/...$//')" ; }  # add ' - ' after each arg, then remove the last 3 chars, then calculate
 function _add () { bc_parsed "$(printf "%s + " "$@" | sed 's/...$//')" ; }  # add ' + ' after each arg, then remove the last 3 chars, then calculate
 
+declare -A algos
+algos['adv']='fib_adv'
+algos['straight']='fib_straight'
+algos['naive']='fib_naive'
+algos['surpass']='fib_surpass'
+
+function fib_surpass () {
+    local i=1
+    local fib_i=1
+    
+    while [[ $(bc <<< "$i < $1") -eq 1 ]]; do  # while our index is smaller than required
+        fib_i="$(bc <<< "5 * $fib_i ^3 - 3*$fib_i")"  # F(3k) = 5*F(k)^3 + (-1)^k*3*F(k) . Here, k is always odd, so there's no need to calculate (-1)*k
+        i=$(bc <<< "$i * 3")
+    done
+    echo "$fib_i"
+}
+
 function fib_adv () {
     # [[ $((n > 326)) -eq 1 ]] && { errcho "Bash on straight method can't calculate above fib[326]. You required index: $n. Sorry."; return 9; }
 
@@ -54,11 +71,11 @@ function mymain () {
     Usage: $BASH_SOURCE <args>
     required args:
     ibonacci index to calculate at
-    <number>                       Fibonacci index to calculate at
+    <number>                                Fibonacci index to calculate at
     optional args:
-    -n                             don't print the calculated result
-    --algo <naive/straight/adv>    calculation algorithm
-    -h / --help                    print this message"
+    -n                                      don't print the calculated result
+    --algo <$(IFS=/; echo "${!algos[*]}")>     calculation algorithm
+    -h / --help                             print this message"
                 exit 0
                 ;;
             --algo )
@@ -81,15 +98,12 @@ function mymain () {
     [[ "$n" =~ ^[1-9][0-9]*$ ]] || { errcho "Index must be a positive integer."; exit 1; } 
     
     [ -z "$algo" ] && algo='adv'  # set default
-    [[ "$algo" != 'adv' && "$algo" != 'straight' && "$algo" != 'naive' ]] && { errcho "Invalid algorithm specified."; exit 1; }
+    [[ -v algos["$algo"] ]] || { errcho "Invalid algorithm specified."; exit 1; }
     
     local temp_file=$(mktemp)  # I don't like using tmp-files instead of vars, but $() is an extra shell layer that swallows the return code
     local result
     {
-        if   [[ "$algo" == 'adv' ]];        then fib_adv "$n";
-        elif [[ "$algo" == 'straight' ]];   then fib_straight "$n";
-        elif [[ "$algo" == 'naive' ]];      then fib_naive "$n";
-        fi
+        ${algos["$algo"]} "$n"
         
         retcode="$?"
         [[ "$retcode" -ne 0 ]] && exit "$retcode"

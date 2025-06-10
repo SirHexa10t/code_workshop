@@ -7,6 +7,7 @@ The used code is written from-scratch, for "authentic" results. Also no writing 
 * Python is written concisely
 * C is written responsibly and with the important optimizations in mind
 * Java is written with objects and streams
+* JavaScript is written to be outdated by tomorrow
 * Rust is written as if trying to prove a point
 * Bash is written as a string processor
 * \<the language you hate\> is written like the piece of shit that it is

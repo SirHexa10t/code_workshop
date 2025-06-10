@@ -14,11 +14,11 @@
 1) F(2k) = F(k) * (2*F(k+1) - F(k))
     1A) F(2k) = F(k) * (F(k+1)+F(k-1))
     1B) F(2k) = F(k) * (F(k+2) + F(k-1) - F(k)) =  F(k+2)F(k) + F(k)F(k-1) - F(k)^2, can use Catalan to simplify -> F(2k) = F(k+1)^2 - (-1)^k + F(k)F(k-1) - F(k)^2
-    1') F(2k) = F(k)*(F(k+1)+F(k-1))
     1'') F(2k+2) = F(k+1)*(F(k+2)+F(k)) = F(k+1)*(F(k+1)+2*F(k))
     1x)  F(k)^2 = 2*F(k+1)F(k)- F(2k)
 2) F(2k+1) = F(k+1)^2 + F(k)^2
-    2') F(2k-1) = F(k) + F(k-1)^2
+    2') F(2k-1) = F(k)^2 + F(k-1)^2
+    2'') F(2k+1) - F(2k-1) = F(2k) = F(k+1)^2 + F(k)^2 - ( F(k)^2 + F(k-1)^2 ) = F(k+1)^2 - F(k-1)^2
 
 
 0)   ->   A) F(k+1)*(F(k+1)-F(k)) = F(k+1)*F(k-1)
@@ -98,8 +98,13 @@ F(2k) = 2*F(k+1)F(k) - F(k)^2
 F(2k+1) = F(k+1)^2 + F(k)^2     got 2) again
 
 
-F(n-1)
-F(n)   has F(n) 1 time  , F(n-1) 0 times
+F(k)F(k-1) = F(k)^2 - F(k-1)^2 + (-1)^k
+    F(k+1)F(k) = F(k+1)^2 - F(k)^2 - (-1)^k
+
+F(k)F(k-1) = F(k+1)*F(k) - F(k)^2
+
+F(n-1)                           1
+F(n)            1
 F(n+1) has F(n) 1 times , F(n-1) 1 times
 F(n+2) has F(n) 2 times , F(n-1) 1 times
 F(n+3) has F(n) 3 times , F(n-1) 2 times  <- each new row is the sum of the previous 2 rows (which is fibo growth)
@@ -116,25 +121,84 @@ F(2n) has F(n) `F(n+1)` times, F(n-1) `F(n)` times
   -> F(3k) = F(k)*F(2k+1) + F(k-1)*F(2k)   =   F(k)(F(2k+2)-F(2k)) + (F(k+1)-F(k))*F(2k) = F(2k+2)F(k) - 2*F(2k)F(k) + F(2k)F(k+1) = (F(2k+2)-2F(2k))F(k) + F(2k)F(k+1)
     = (F(2k+1)-F(2k))F(k) + F(2k)F(k+1) = (F(k+1)^2 + F(k)^2 - F(2k))F(k) + F(2k)F(k+1) = (F(k+1)^2 + F(k)^2 - (2*F(k+1)F(k) - F(k)^2) )F(k) + (2*F(k+1)F(k) - F(k)^2)F(k+1) =
     = 3*F(k+1)^2*F(k) + 2F(k)^3 - 3*F(k+1)F(k)^2  =  3*F(k+1)F(k)( F(k+1)-F(k) ) + 2F(k)^3 = 3*F(k+1)F(k)F(k-1) + 2F(k)^3 =  3*F(k)*(F(k)^2 + (-1)^k) + 2F(k)^3
-    = 5*F(k)^3 + (-1)^k*3*F(k) 
+    = 5*F(k)^3 + (-1)^k*3*F(k)
   -> F(3k+1) = F(k)*F(2k+2) + F(k-1)*F(2k+1) = F(k)*(F(2k+1)+F(2k)) + F(k-1)*(F(2k)+F(2k-1)) = F(k)*F(2k+1) + F(k)*F(2k) + F(k-1)*F(2k) + F(k-1)*F(2k-1)
-             = F(3k) + F(k)*F(2k) + F(k-1)*F(2k-1) = F(3k) + F(k)^2 * (F(k+1)+F(k-1)) + F(k-1)*(F(k)^2 + F(k+1)^2) = F(3k) + 
+             = F(3k) + F(k)*F(2k) + F(k-1)*F(2k-1) = F(3k) + F(k)^2 * (F(k+1)+F(k-1)) + F(k-1)*(F(k)^2 + F(k-1)^2) = F(3k) + 2*F(k-1)*F(k)^2 + F(k+1)*F(k)^2 + F(k-1)^3
+             = F(3k) + 2*F(k-1)*F(k)^2 + (F(k)+F(k-1))*F(k)^2 + F(k-1)^3 = F(3k) + 3*F(k-1)*F(k)^2 + F(k)^3 + F(k-1)^3
+             = F(3k) + (F(k)+F(k-1))^3 - 3*F(k)*F(k-1)^2 = F(3k) + F(k+1)^3 - 3*F(k)*F(k-1)^2
+             = F(3k) + F(k+1)^3 - 3F(k)*(F(k+1)-F(k))^2 = F(3k) + F(k+1)^3 - 3F(k)*F(k+1)^2 + 6F(k)^2*F(k+1) - 3F(k)^3
+             = 5*F(k)^3 + (-1)^k*3*F(k) + F(k+1)^3 - 3F(k)*F(k+1)^2 + 6F(k)^2*F(k+1) - 3F(k)^3
+             = 2*F(k)^3 + (-1)^k*3*F(k) + F(k+1)^3 - 3F(k)*F(k+1)^2 + 6F(k)^2*F(k+1)
+             = F(k)(2*F(k)^2 + (-1)^k*3)  +  F(k+1)(F(k+1)^2 - 3F(k)*F(k+1) + 6F(k)^2)
+             = F(k)(2*F(k)^2 + (-1)^k*3)  +  F(k+1)(F(k+1)^2 - 3F(k)^2 - 3F(k)F(k-1) + 6F(k)^2)
+             = F(k)(2*F(k)^2 + (-1)^k*3)  +  F(k+1)(F(k+1)^2 - 3F(k)F(k-1) + 3F(k)^2)
+             
+             = F(3k) + F(k+1)^3 - 3F(k)*(F(k+1) - F(k))^2
+             
+             = F(3k) + F(k+1)^3 - 3*F(k)*(F(k+1) - F(k))*(F(k+1) - F(k)) = 
+             
+             F(3k) + F(k)*F(2k) + F(k-1)*F(2k-1) =
+             = F(3k) + F(k)^2 * (F(k+1)+F(k-1))  + F(k-1)(F(k)^2 + F(k-1)^2)
+             = F(3k) + F(k)^2 * (F(k)+2F(k-1))+ F(k-1)F(k)^2 + F(k-1)^3
+             = F(3k) + F(k)^3 + 3F(k-1)F(k)^2 + F(k-1)^3
+             
+             F(3k) + F(k)*F(2k) + F(k-1)*F(2k-1) = F(3k) + F(k)*(F(2k+1) - F(2k-1)) + F(k-1)*(F(2k)-F(2k-2))
+             = 2*F(3k) - F(k)F(2k-1) - F(k-1)F(2k-2) = 2*F(3k) - F(k)(F(k)^2 + F(k-1)^2) - F(k-1)(2*F(k)F(k-1) - F(k-1)^2)
+             = 2*F(3k) - F(k)^3 - F(k-1)^2*F(k) - 2*F(k)F(k-1)^2 + F(k-1)^3
+             = 2*F(3k) - F(k)^3 - 3*F(k)F(k-1)^2 + F(k-1)^3 =
+             = 2*F(3k) - F(k)^3 - 3*F(k)F(k-1)^2 + F(k-1)^3
+             
+             the 2 above are equal:
+             F(3k) + F(k)^3 + 3F(k-1)F(k)^2 + F(k-1)^3 = 2*F(3k) - F(k)^3 - 3*F(k)F(k-1)^2 + F(k-1)^3
+             F(3k) = 2F(k)^3 + 3F(k-1)F(k)*(F(k) + F(k-1))
+              -> F(k+1)F(k)F(k-1) = ( F(3k) - 2F(k)^3 ) / 3 = ( 3*F(k)^3 + (-1)^k*3*F(k) ) / 3 = F(k)^3 + (-1)^k*F(k)
+              
+            so:  F(k+1)F(k)F(k-1) = F(k)^3 + (-1)^k*F(k)
+              -> F(3k) = 3*F(k+1)F(k)F(k-1) + 2*F(k)^3
+            
+            
   -> F(4k) = F(k)*F(3k+1) + F(k-1)*F(3k)
-  
-  
+
   From F(3k)'s identity:  (which is quite incredible as we can use only one index to calculate onwards)
-    F(9k) = 5*F(3k)^3 + (-1)^k*3*F(3k) =   
-        = ... = 625F(k)^9 + (-1)^k*1125F(k)^7 + 675(k)^5 + (-1)^k*150F(k)^3 + (-1)^k*9F(k)
-    
-    
-    5F(k)*( 5*F(k)^2 + (-1)^k*3 )^3  + (-1)^k*3F(k)*( 5*F(k)^2 + (-1)^k*3 )
-          = 5F(k)*( 125*F(k)^6 + 3*25*F(k)^4*(-1)^k*3 + 3*5*F(k)^2*9 + (-1)^k*27 ) + (-1)^k*15F(k)^3 + 3*3F(k)
-          = 5F(k)*( 125*F(k)^6 + (-1)^k*225*F(k)^4 + 135*F(k)^2 + (-1)^k*27 ) + (-1)^k*15F(k)^3 + 3*3F(k)
-          = 625*F(k)^7 + (-1)^k*1125*F(k)^5 + 675*F(k)^3 + (-1)^k*135*F(k) + (-1)^k*15F(k)^3 + 9*F(k)
-          = (-1)^k*(1125*F(k)^5 + 15*F(k)^3 + 135*F(k)) + 625*F(k)^7 + 675*F(k)^3 + 9*F(k)
+    F(9k) = 5*F(3k)^3 + (-1)^k*3*F(3k) = 5F(k)^3*( 5*F(k)^2 + (-1)^k*3 )^3  + (-1)^k*3F(k)*( 5*F(k)^2 + (-1)^k*3 )
+          = 5F(k)^3*( 125*F(k)^6 + 3*25*F(k)^4*(-1)^k*3 + 3*5*F(k)^2*9 + (-1)^k*27 ) + (-1)^k*15F(k)^3 + 3*3F(k)
+          = 5F(k)^3*( 125*F(k)^6 + (-1)^k*225*F(k)^4 + 135*F(k)^2 + (-1)^k*27 ) + (-1)^k*15F(k)^3 + 3*3F(k)
+          = 625*F(k)^9 + (-1)^k*1125*F(k)^7 + 675*F(k)^5 + (-1)^k*135*F(k)^3 + (-1)^k*15F(k)^3 + 9*F(k)
+          = 625*F(k)^9 + (-1)^k*1125*F(k)^7 + 675*F(k)^5 + (-1)^k*150*F(k)^3 + 9*F(k)
+          = 625*F(k)^9 + 675*F(k)^5 + 9*F(k) + (-1)^k*1125*F(k)^7 + (-1)^k*150*F(k)^3
           
+  From F(3k)'s identity:  
+    F(6k) = 5*F(2k)^3 + (-1)^k*3*F(2k)
+    
+  alternatively, since F(2k) = F(k) * (2*F(k+1) - F(k))
+  F(2k) = 2*F(k+1)F(k) - F(k)^2  ->  F(6k) = 2*F(3k+1)F(3k) - F(3k)^2
 */
 
+
+
+void fib_surpass(uint64_t n, bool is_printing)
+{
+    mpz_t fk, fffk;
+    mpz_init_set_ui(fk, 1);    // F(k)
+    mpz_init_set_ui(fffk, 1);  // F(k)^3
+    
+    // Calculate this over and over: F(3k) = 5*F(k)^3 + (-1)^k*3*F(k). We only use odd index, so: F(3k) = 5*F(k)^3 - 3*F(k)
+    for (uint64_t i = 1; i < n; i*=3)
+    {
+        mpz_pow_ui(fffk, fk, 3);    // f(k)^3
+        mpz_mul_ui(fffk, fffk, 5);  // 5*f(k)^3
+        
+        mpz_mul_ui(fk, fk, 3);  // 3*F(k)
+        mpz_sub(fk, fffk, fk);  // 5*F(k)^3 - 3*F(k)
+    }
+    
+    // printing
+    if (is_printing) gmp_printf("%Zd\n", fk);
+    
+    // // cleanup
+    mpz_clear(fk);
+    mpz_clear(fffk);
+}
 
 // find by finding fibo(k/2) (and find that through fibo(k/4)...)
 // Then find F(k) = F(2x) = F(x) * (2*F(x+1) - F(x))  and  F(k+1) = F(2x+1) = F(x+1)^2 + F(x)^2
@@ -353,8 +417,8 @@ int main(int argc, char *argv[])
             if (is_set_algo) return fprintf(stderr, set_twice_err, "algorithm"), 1; else is_set_algo = true;
             if (i + 1 >= argc) return fprintf(stderr, "--algo requires a following argument: naive/straight/adv\n"), 1;
             
-            if (strcmp(argv[i+1], "naive") == 0 || strcmp(argv[i+1], "straight") == 0 || strcmp(argv[i+1], "adv") == 0) algo = argv[i+1];
-            else return fprintf(stderr, "Unrecognized algorithm: '%s'. Valid algorithms: naive straight adv\n", argv[i+1]), 1;
+            if (strcmp(argv[i+1], "naive") == 0 || strcmp(argv[i+1], "straight") == 0 || strcmp(argv[i+1], "adv") == 0 || strcmp(argv[i+1], "surpass") == 0) algo = argv[i+1];
+            else return fprintf(stderr, "Unrecognized algorithm: '%s'. Valid algorithms: naive straight adv surpass\n", argv[i+1]), 1;
             i++;
         }
         else  // fibo-index (required) 
@@ -374,6 +438,7 @@ int main(int argc, char *argv[])
     if (strcmp(algo, "naive")==0) fib_naive_caller(index, is_printing);
     else if (strcmp(algo, "straight")==0) fib_straight(index, is_printing);
     else if (strcmp(algo, "adv")==0) fib_adv(index, is_printing);
+    else if (strcmp(algo, "surpass")==0) fib_surpass(index, is_printing);
     
 }
 
